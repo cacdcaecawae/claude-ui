@@ -32,13 +32,15 @@ class ClaudeProcessManager {
       args.push('--session-id', sessionId);
     }
 
-    // -p = print mode (non-interactive), --output-format stream-json for structured streaming
-    args.push('-p', message, '--output-format', 'stream-json');
+    // -p = print mode (non-interactive, flag only, no value)
+    // --output-format stream-json requires --verbose
+    // message goes last as positional argument
+    args.push('-p', '--output-format', 'stream-json', '--verbose', message);
 
     const child = spawn('claude', args, {
       cwd: workspace,
-      stdio: ['pipe', 'pipe', 'pipe'],
-      env: { ...process.env },
+      stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, FORCE_COLOR: '0', NO_COLOR: '1' },
     });
 
     this.processes.set(sessionId, child);
